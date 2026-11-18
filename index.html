@@ -64,7 +64,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--blue);outline-o
 <body>
 <main>
   <h1>내전 팀 밸런서</h1>
-  <p class="sub">참여할 10명을 체크하고 팀 만들기를 누르세요. 티어 합계와 라인 적합도를 함께 맞춰 5대5로 나눕니다[cite: 1].</p>
+  <p class="sub">참여할 10명을 체크하고 팀 만들기를 누르세요. 티어 합계와 라인 적합도를 함께 맞춰 5대5로 나눕니다.</p>
 
   <section class="card">
     <div class="head"><h2>참여자</h2><span id="cnt" class="cnt"></span></div>
@@ -72,10 +72,10 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--blue);outline-o
       <thead><tr><th>참가</th><th style="text-align:left">이름</th><th>티어</th><th>탑</th><th>정글</th><th>미드</th><th>원딜</th><th>서폿</th><th></th></tr></thead>
       <tbody id="body"></tbody>
     </table></div>
-    <p class="hint">라인 버튼을 누를 때마다 주 → 부 → 해제 순으로 바뀝니다. 티어는 I(아이언) B S G P E D M 뒤에 숫자 1~4, 예: D4, E1. 마스터 이상은 M[cite: 1].</p>
-    <div class="row" style="margin-top:10px"><button class="btn" id="add">참여자 추가</button><button class="btn" id="reset">기본값으로 되돌리기</button></div>
+    <p class="hint">라인 버튼을 누를 때마다 주 → 부 → 해제 순으로 바뀝니다. 티어는 I(아이언) B S G P E D M 뒤에 숫자 1~4, 예: D4, E1. 마스터 이상은 M.</p>
+    <div class="row" style="margin-top:10px"><button class="btn" id="add">참여자 추가</button><button class="btn" id="clr">선택 모두 해제</button><button class="btn" id="reset">기본값으로 되돌리기</button></div>
     <label class="opt">라인 적합도 중요도<input type="range" id="w" min="0" max="4" step="0.5" value="1.5"><span id="wv">1.5</span></label>
-    <p class="hint">숫자가 클수록 주 라인 배정을 우선하고, 작을수록 티어 균형을 우선합니다[cite: 1].</p>
+    <p class="hint">숫자가 클수록 주 라인 배정을 우선하고, 작을수록 티어 균형을 우선합니다.</p>
   </section>
 
   <div class="row" style="margin-bottom:14px"><button class="btn pri" id="go" disabled>팀 만들기</button><button class="btn" id="again" disabled>다시 섞기</button></div>
@@ -101,8 +101,8 @@ var DEF=[
 ['신영재',[4],[0,3],'S1'],
 ['전준상',[2],[3,4],'D4']
 ];
-var KEY='lol-balancer-v1';
-function defaults(){return DEF.map(function(d,i){return{n:d[0],m:d[1].slice(),s:d[2].slice(),t:d[3],on:i<10}})}
+var KEY='lol-balancer-v2';
+function defaults(){return DEF.map(function(d){return{n:d[0],m:d[1].slice(),s:d[2].slice(),t:d[3],on:false}})}
 var P;
 try{P=JSON.parse(localStorage.getItem(KEY));if(!Array.isArray(P))P=null}catch(e){P=null}
 if(!P)P=defaults();
@@ -159,6 +159,7 @@ body.addEventListener('click',function(e){
   }
 });
 document.getElementById('add').onclick=function(){P.push({n:'새 참여자',m:[],s:[],t:'S4',on:false});save();render()};
+document.getElementById('clr').onclick=function(){P.forEach(function(p){p.on=false});save();render()};
 document.getElementById('reset').onclick=function(){P=defaults();save();render()};
 var wEl=document.getElementById('w');
 wEl.oninput=function(){document.getElementById('wv').textContent=wEl.value};
@@ -221,4 +222,18 @@ function show(){
   document.getElementById('out').innerHTML='<div class="teams">'+teamHtml('a','블루팀',r.A,r.pa,r.sa)+teamHtml('b','레드팀',r.B,r.pb,r.sb)+'</div>'
     +'<p class="sum">티어 점수 차이 <b>'+diff+'</b> (1점 = 1디비전) · 오프라인 배정 <b>'+off+'명</b></p>';
 }
-document.getElementById('chips').onclick=function(e){var b
+document.getElementById('chips').onclick=function(e){var b=e.target.closest('button');if(b){CUR=+b.dataset.c;show()}};
+document.getElementById('go').onclick=function(){run(0)};
+document.getElementById('again').onclick=function(){run(2.5)};
+document.getElementById('copy').onclick=function(){
+  var r=RES[CUR];if(!r)return;
+  function t(name,team,pm){var rows=[];for(var i=0;i<5;i++)rows[pm[i]]=team[i];return name+'\n'+rows.map(function(p,l){return LANES[l]+' '+p.n+' ('+p.t.toUpperCase()+')'}).join('\n')}
+  var txt=t('블루팀',r.A,r.pa)+'\n\n'+t('레드팀',r.B,r.pb);
+  var b=document.getElementById('copy');
+  try{navigator.clipboard.writeText(txt).then(function(){b.textContent='복사됨'},function(){b.textContent='복사 실패'})}catch(e){b.textContent='복사 실패'}
+  setTimeout(function(){b.textContent='결과 복사'},1500);
+};
+render();
+</script>
+</body>
+</html>
