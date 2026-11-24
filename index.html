@@ -104,7 +104,7 @@ var DEF=[
 ['임성제',[0,1,2,4],[],'P2'],
 ['박승원',[3,4],[],'G4']
 ];
-var KEY='lol-balancer-v2';
+var KEY='lol-balancer-v3';
 function defaults(){return DEF.map(function(d){return{n:d[0],m:d[1].slice(),s:d[2].slice(),t:d[3],on:false}})}
 var P;
 try{P=JSON.parse(localStorage.getItem(KEY));if(!Array.isArray(P))P=null}catch(e){P=null}
